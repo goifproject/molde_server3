@@ -19,8 +19,8 @@ module.exports = function (router) {
 
     // 댓글 신고 삭제
     router.delete("/commreport", function (req, res, next) {
-        let comm_rep_id = req.body.commentReportId;
-        CommentReport.removeCommentReport(comm_rep_id, function (err, reps) {
+        let comm_id = req.body.commentId;
+        CommentReport.removeCommentReport(comm_id, function (err, reps) {
             if (err) {
                 logger.info(err);
                 res.status(200).send({result:0});

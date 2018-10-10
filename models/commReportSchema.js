@@ -77,7 +77,7 @@ commReportSchema.statics.getCommentReports = function(per_page, page, callback){
 
 commReportSchema.statics.removeCommentReport = function(comm_rep_id, callback){
     CommentReport.collection.findOneAndDelete({
-        comm_rep_id: Number(comm_rep_id)
+        comm_id: Number(comm_rep_id)
     },function(err, result){
         if(err) callback(err);
         else{

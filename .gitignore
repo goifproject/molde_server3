@@ -2,6 +2,7 @@
 config/
 db_config/
 node_modules/
+log/
 
 # Ignore File
 subway.csv

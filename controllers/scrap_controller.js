@@ -56,13 +56,10 @@ module.exports = function (router) {
         Scrap.isScrapExist(user_id, news_id, function (err, scraps) {
             if (err) {
                 logger.info(err);
-                //res.status(200).send({result:0});
+                res.status(200).send({result:0});
             }
             else {
-                if(scraps.length != 0)
-                    res.json({result : 1});
-                else
-                    res.json({result : 0});
+                res.json({data : scraps});
             }
         })
     });
