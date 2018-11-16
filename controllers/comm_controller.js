@@ -14,9 +14,9 @@ module.exports = function (router) {
         Comment.addComment(user_id, user_name, news_id, content, function (err, result) {
             if (err) {
                 logger.info(err);
-                res.status(200).send({result:0});
+                res.status(200).send({'result':0});
             } else {
-                res.status(200).send({result:1});
+                res.status(200).send({'result':result.ops[0].comm_id});
             }
         })
     });
@@ -111,4 +111,5 @@ module.exports = function (router) {
             }
         })
     });
+
 };

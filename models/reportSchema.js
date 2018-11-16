@@ -53,6 +53,7 @@ reportSchema.statics.uploadPin = function (rep_id, rep_nm, rep_contents, img_obj
         }
     });
 };
+
 // 신고 내역 추가
 reportSchema.statics.insertReportFunc = function (user_name, user_email, rep_contents, rep_lat, rep_lon, rep_addr, rep_detail_addr, rep_state, user_id, img_object, callback) {
     let now = new Date;
@@ -84,12 +85,13 @@ reportSchema.statics.insertReportFunc = function (user_name, user_email, rep_con
                         else {
                             logger.info("reportSchema : in fav find");
                             logger.info("favs : " + favs);
+                            
                             var list = [];
                             favs.forEach(fav => {
                                 if(!list.includes(fav)){
-                                    logger.info("fav : " + fav);
-                                    logger.info("fav.value : " + fav.value);
-                                    logger.info("fav.value.user_id : " + fav.value.user_id);
+                                    // logger.info("fav : " + fav);
+                                    // logger.info("fav.value : " + fav.value);
+                                    // logger.info("fav.value.user_id : " + fav.value.user_id);
                                     list.push(fav);
                                     FCM.sendNewReportPush(fav.value.user_id, _seq);
                                 }
