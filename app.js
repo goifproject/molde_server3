@@ -45,6 +45,10 @@ setInterval(function(){
     Facebook.getFacebookPosts()
 }, 86400000);
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.set('port', port);
+
 app.set('port', port);
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
