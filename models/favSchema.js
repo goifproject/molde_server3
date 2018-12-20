@@ -77,7 +77,7 @@ favSchema.statics.getFavorites = function(user_id, per_page, page, callback){
                             logger.info('get favorites schema error - '+err);
                             callback(err);
                         } else {
-                            callback(null, result);
+                            callback(null, docs);
                         }
                     });
                 } else {
