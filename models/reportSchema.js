@@ -72,34 +72,9 @@ reportSchema.statics.insertReportFunc = function (user_name, user_email, rep_con
             rep_img: img_object,
             rep_state: Number(rep_state)
         }, function (err, result) {
-            if (err) callback(err);
-            else {
-                // 푸시 메시지
-                logger.info("reportSchema : before fav find");
-                Favorite.collection.find({
-                    fav_lat: {$gte : Number(rep_lat)-0.013, $lte : Number(rep_lat)+0.013},
-                    fav_lon: {$gte : Number(rep_lon)-0.016, $lte : Number(rep_lon)+0.016},
-                }, {projection: {_id: 0, user_id: 1 }}, 
-                function (error, favs) {
-                        if (error) callback(error);
-                        else {
-                            logger.info("reportSchema : in fav find");
-                            logger.info("favs : " + favs);
-                            
-                            var list = [];
-                            favs.forEach(fav => {
-                                if(!list.includes(fav)){
-                                    // logger.info("fav : " + fav);
-                                    // logger.info("fav.value : " + fav.value);
-                                    // logger.info("fav.value.user_id : " + fav.value.user_id);
-                                    list.push(fav);
-                                    FCM.sendNewReportPush(fav.value.user_id, _seq);
-                                }
-                            });
-                            logger.info("reportScema : end fav find");
-                        }
-                    }
-                );
+            if (err) {
+                callback(err);
+            } else {
                 callback(null, result);
             }   
         })
@@ -109,18 +84,42 @@ reportSchema.statics.insertReportFunc = function (user_name, user_email, rep_con
 // 관리자 >> marker 색 변경
 // 0:접수중(빨)  1:접수완료(빨)  2:제거(파)  3:미발견(하)
 reportSchema.statics.updateRptMarker = function (rep_id, rep_state, callback) {
-    logger.info("In update Marker");
-    logger.info(rep_id + ", " + rep_state)
-    Report.collection.findOneAndUpdate( // find & update 로 변경
+
+    // find & update 로 변경
+    Report.collection.findOneAndUpdate( 
         { rep_id: Number(rep_id) }, 
         { $set: {rep_state: Number(rep_state)} }, 
-        {projection: {"_id": 0, "rep_id": 1, "user_id": 1}}, 
+        { projection: {"_id": 0, "rep_id": 1, "user_id": 1, 'rep_lat':1, 'rep_lon':1 }}, 
         function(err, result){
-            if(err) callback(err);
-            else{
-                logger.info("update success => user_id :" + result.value.user_id);
+            if(err) {
+                callback(err);
+            } else {
+                // 변경된 피드 상태 푸쉬 알람
                 FCM.sendStateChangePush(result.value.user_id, rep_id);
+                
+                // 상태값이 처음 변경된 경우에만 푸쉬 넘겨줌
+                if (Number(rep_state) == 1){
+                    // 주변에 즐겨찾기가 있으면 푸쉬 넘겨줌
+                    Favorite.collection.find({
+                        fav_lat: {$gte : Number(result.value.rep_lat)-0.013, $lte : Number(result.value.rep_lat)+0.013},
+                        fav_lon: {$gte : Number(result.value.rep_lon)-0.016, $lte : Number(result.value.rep_lon)+0.016},
+                    }, {projection: { _id: 0, user_id: 1 }}, 
+                    function (error, favs) {
+                            if (error) callback(error);
+                            else {
+                                var list = [];
+                                favs.forEach(fav => {
+                                    if(!list.includes(fav)){
+                                        list.push(fav);
+                                        FCM.sendNewReportPush(fav.user_id, rep_id);
+                                    }
+                                });
+                            }
+                        }
+                    );
+                }
                 callback(null, result);
+
             }
         }
     );

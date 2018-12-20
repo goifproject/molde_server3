@@ -11,40 +11,41 @@ var pageToken = Facebook.pageToken;
 FB.setAccessToken(pageToken);
 
 exports.getFacebookPosts = function(){
-    FB.api('2000008220011384/posts?fields=attachments,created_time', function (res) {
+
+    FB.api('2000008220011384/posts?fields=picture,message,updated_time', function (res) {
         if(!res || res.error) {
-            logger.info(!res ? 'error occurred' : res.error);
+            logger.info(!res ? 'facebook crawling error occurred' : 'facebook crawling error occurred ' + res.error);
             return;
         }
+        logger.info('Facebook cardnews post checkup - count ' + res.data.length)
 
-        var i,j;
-        for (i = 0; i < res.data.length; i++){
+        var page_num = 0;
+        for (var i = 0; i < res.data.length; i++){
             var news = {description: "", news_img: [], date: "", post_id: ""}
-
-            if(res.data[i].created_time){
-                news.date = moment(res.data[i].created_time).format();
-                if(moment(res.data[i].created_time).isBefore(moment().subtract(1, 'days')))
-                    continue;
-                // if(moment(res.data[i].created_time).isBefore(moment().subtract(3, 'minutes')))
-                //     continue;
+            var postData = res.data[i];
+            // 생성 날짜
+            if(postData.updated_time){
+                news.date = moment(postData.created_time).format();
+                // 하루에 한번씩 업데이트 되기 때문에 1일 이전 데이터는 지나간다
+                if(moment(postData.updated_time).isBefore(moment().subtract(1, 'days'))) continue;
             }
+            
+            // 포스트 아이디
+            if(!postData.id) continue;
+            news.post_id = postData.id;
 
-            if(res.data[i].id)
-                news.post_id = res.data[i].id;
+            // 포스트 이미지
+            if (!postData.picture) continue;
+            news.news_img.push({
+                'url': postData.picture,
+                'page_num': page_num
+            });
+            page_num++;
 
-            if(res.data[i].attachments.data[0].subattachments){
-                if(res.data[i].attachments.data[0].description)
-                    news.description = res.data[i].attachments.data[0].description;
-
-                for(j = 0; j < res.data[i].attachments.data[0].subattachments.data.length; j++){
-                    let image = {};
-                    image.page_num = j;
-                    image.url = res.data[i].attachments.data[0].subattachments.data[j].url;
-                    news.news_img.push(image);
-                }
-            }
-
+            // 포스트 메시지
+            if (postData.message) news.description = res.data[i].message;
+            
             News.updateNewsFromFB(news);
         }
-    })
+    });
 }

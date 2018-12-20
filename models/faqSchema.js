@@ -17,8 +17,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get faq collection count and update schema error - '+err);
+            } else {
                 cb(result.seq);
             }
         }
@@ -33,9 +34,11 @@ faqSchema.statics.insertFaqData = function (user_id, user_name, faq_contents, fa
             user_name: user_name,
             faq_contents: faq_contents,
             faq_email: faq_email
-        }, function (error, result) {
-            if (error) callback(new Error(error));
-            else {
+        }, function (err, result) {
+            if (err) {
+                logger.info('inser faq schema error - '+err);
+                callback(new Error(err));
+            } else {
                callback(null, result);
             }
         });
@@ -47,12 +50,28 @@ faqSchema.statics.getFaqs = function(per_page, page, callback){
     }, {projection: {"_id": 0, "faq_id": 1, "user_id": 1,
         "user_name": 1, "faq_contents": 1, "faq_email": 1 }},
     function (err, faqs) {
-        if (err) callback(err);
-        else {
+        if (err) {
+            logger.info('get faqs schema error - '+err);
+            callback(err);
+        } else {
             if(per_page != -1 && page != -1)
-                faqs.sort({'faq_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
+                faqs.sort({'faq_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get faqs schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, result);
+                    }
+                });
             else
-                faqs.toArray(function(err,docs){callback(null, docs)});
+                faqs.toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get faqs schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, docs);
+                    }
+                });
         }
     });
 };

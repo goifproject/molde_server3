@@ -5,8 +5,9 @@ module.exports = function (router) {
         let page = req.query.page != undefined ? Number(req.query.page) : -1;
         let per_page = req.query.perPage != undefined ? Number(req.query.perPage) : -1;
         News.getCardNews(per_page, page, function (err, news) {
-            if (err) console.error(new Error(err));
-            else {
+            if (err) {
+                logger.info('get cardnews error - '+err);
+            } else {
                 res.json({data: news});
             }
         })
@@ -15,8 +16,9 @@ module.exports = function (router) {
     router.get("/newsid", function (req, res, next) {
         let news_id = req.query.cardNewsId;
         News.getCardNewsByID(news_id, function (err, news) {
-            if (err) console.error(new Error(err));
-            else {
+            if (err) {
+                logger.info('get cardnews by id error - '+err);
+            } else {
                 res.json({data: news});
             }
         })

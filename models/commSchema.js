@@ -20,8 +20,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get comment collection count and update schema error - '+err);
+            } else{
                 cb(result.seq);
             }
         }
@@ -40,11 +41,13 @@ commSchema.statics.addComment = function(user_id, user_name, news_id, content, c
             comm_date: now.getTime(),
             comm_rep: 0
         }, function (err, result) {
-            if (err) callback(err);
-            else {
+            if (err) {
+                logger.info('add comment schema error - '+err);
+                callback(err);
+            } else {
                 callback(null, result);
             }
-        })
+        });
     });
 };
 
@@ -53,8 +56,10 @@ commSchema.statics.removeComment = function(user_id, comm_id, callback){
         user_id: user_id,
         comm_id: Number(comm_id)
     },function(err, result){
-        if(err) callback(err);
-        else{
+        if(err) {
+            logger.info('remove comment schema error - '+err);
+            callback(err);
+        } else{
             callback(null, result);
         }
     });
@@ -64,8 +69,10 @@ commSchema.statics.removeCommentForAdmin = function(comm_id, callback){
     Comment.collection.findOneAndDelete({
         comm_id: Number(comm_id)
     },function(err, result){
-        if(err) callback(err);
-        else{
+        if(err) {
+            logger.info('remove comment for admin schema error - '+err);
+            callback(err);
+        } else{
             callback(null, result);
         }
     });
@@ -81,8 +88,9 @@ commSchema.statics.reportComment = function(user_id, comm_id, callback){
                 {$inc: {comm_rep: 1}},
                 {projection: {"_id": 0, "comm_id": 1, "comm_rep": 1}},
                 function(err, result){
-                    if(err) logger.info(new Error(err));
-                    else{
+                    if(err) {
+                        logger.info('report comment schema error - '+err);
+                    } else {
                         CommReport.addCommentReport(user_id, comm_id, callback);
                     }
                 }
@@ -97,12 +105,26 @@ commSchema.statics.getCommentsNews = function(news_id, per_page, page, callback)
     }, {projection: {"_id": 0, "comm_id": 1, "user_id": 1,
         "user_name": 1, "news_id": 1, "comment": 1, "comm_date": 1 }},
     function (err, comments) {
-        if (err) callback(err);
-        else {
+        if (err) {
+            logger.info('get comment news schema error - '+err);
+            callback(err);
+        } else {
             if(per_page != -1 && page != -1)
-                comments.sort({'comm_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
+                comments.sort({'comm_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get comment news schema error - '+err);
+                    } else {
+                        callback(null, docs)
+                    }
+                });
             else
-                comments.toArray(function(err,docs){callback(null, docs)});
+                comments.toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get comment news schema error - '+err);
+                    } else {
+                        callback(null, docs)
+                    }
+                });
         }
     });
 };
@@ -113,12 +135,27 @@ commSchema.statics.getCommentsUser = function(user_id, per_page, page, callback)
     }, {projection: {"_id": 0, "comm_id": 1, "user_id": 1,
         "user_name": 1, "news_id": 1, "comment": 1, "comm_date": 1 }},
     function (err, comments) {
-        if (err) callback(err);
-        else {
-            if(per_page != -1 && page != -1)
-                comments.sort({'comm_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
-            else
-                comments.toArray(function(err,docs){callback(null, docs)});
+        if (err) {
+            logger.info('get comment user schema error - '+err);
+            callback(err);
+        } else {
+            if(per_page != -1 && page != -1) {
+                comments.sort({'comm_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get comment user schema error - '+err);
+                    } else {
+                        callback(null, docs)
+                    }
+                });
+            } else {
+                comments.toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get comment user schema error - '+err);
+                    } else {
+                        callback(null, docs)
+                    }
+                });
+            }
         }
     });
 };
@@ -129,9 +166,17 @@ commSchema.statics.getCommentsID = function(comm_id, callback){
     }, {projection: {"_id": 0, "comm_id": 1, "user_id": 1,
         "user_name": 1, "news_id": 1, "comment": 1, "comm_date": 1 }},
     function (err, comments) {
-        if (err) callback(err);
-        else {
-            comments.toArray(function(err,docs){callback(null, docs)});
+        if (err) {
+            logger.info('get comment id schema error - '+err);
+            callback(err);
+        } else {
+            comments.toArray(function(err,docs){
+                if (err) {
+                    logger.info('get comment id schema error - '+err);
+                } else {
+                    callback(null, docs)
+                }
+            });
         }
     });
 };

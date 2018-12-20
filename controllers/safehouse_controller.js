@@ -11,7 +11,7 @@ module.exports = function (router) {
 
         Safehouse.getSafehouse(safe_lat, safe_lon, per_page, page, function (err, data) {
             if (err) {
-                logger.info(err);
+                logger.info('get safehouse error - '+err);
                 res.status(200).send({result:0});
             }
             else {

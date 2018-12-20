@@ -11,7 +11,7 @@ module.exports = function (router) {
         let user_token = req.body.userToken;
         User.addUser(user_id, user_name, user_token, function (err, result) {
             if (err) {
-                logger.info(err);
+                logger.info('add user error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result:1});

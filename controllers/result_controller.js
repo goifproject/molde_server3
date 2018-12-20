@@ -58,7 +58,7 @@ module.exports = function (router) {
 
         Result.insertReportResultFunc(rep_id, img_array, function (err, report) {
             if (err){
-                logger.info(err);
+                logger.info('insert report result error - '+err);
                 res.status(200).send({result:0});
             }
             else {
@@ -71,7 +71,7 @@ module.exports = function (router) {
         let rep_id = req.query.reportId;
         Result.showReportResult(rep_id,function (err,result) {
             if(err) {
-                logger.info(err);
+                logger.info('show report result error - '+err);
                 res.status(200).send({result:0});
             }
             else{

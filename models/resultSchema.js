@@ -20,8 +20,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get result collection count and update schema error - '+err);
+            } else{
                 cb(result.seq);
             }
         }
@@ -38,8 +39,10 @@ resultSchema.statics.insertReportResultFunc = function (rep_id, img_object, call
             result_date: now.getTime(),
             result_img: img_object,
         }, function (err, result) {
-            if (err) callback(err);
-            else {
+            if (err) {
+                logger.info('insert report result schema error - ' + err);
+                callback(err);
+            } else {
                 callback(null, result);
             }   
         })
@@ -52,9 +55,18 @@ resultSchema.statics.showReportResult = function (rep_id, callback) {
     }, {projection: {"_id": 0, "result_id": 1, "rep_id": 1,
             "result_date": 1, "result_img": 1 }},
     function (error, results) {
-            if (error) callback(error);
-            else {
-                results.toArray(function(err,result){callback(null, result)});
+            if (error) {
+                logger.info('show report result schema error - ' + err);
+                callback(error);
+            } else {
+                results.toArray(function(err,result){
+                    if(err) {
+                        logger.info('show report result schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, result);
+                    }
+                });
             }
         }
     );

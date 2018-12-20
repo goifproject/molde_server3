@@ -18,8 +18,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get favorite collection count and update schema error - '+err);
+            } else {
                 cb(result.seq);
             }
         }
@@ -36,8 +37,10 @@ favSchema.statics.addFavorite = function(user_id, fav_name, fav_addr, fav_lat, f
             fav_lat: Number(fav_lat),
             fav_lon: Number(fav_lon)
         }, function (err, result) {
-            if (err) callback(err);
-            else {
+            if (err) {
+                logger.info('add favroite schema error - '+err);
+                callback(err);
+            } else {
                 callback(null, result);
             }
         })
@@ -49,8 +52,10 @@ favSchema.statics.removeFavorite = function(user_id, fav_id, callback){
         user_id: user_id,
         fav_id: Number(fav_id)
     },function(err, result){
-        if(err) callback(err);
-        else{
+        if(err) {
+            logger.info('remove favroite schema error - '+err);
+            callback(err);
+        } else {
             callback(null, result);
         }
     });
@@ -62,12 +67,29 @@ favSchema.statics.getFavorites = function(user_id, per_page, page, callback){
     }, {projection: {"_id": 0, "user_id": 1, "fav_id": 1, "fav_name": 1,
         "fav_addr": 1, "fav_lat": 1, "fav_lon": 1}},
     function (err, favs) {
-        if (err) callback(err);
-        else {
-            if(per_page != -1 && page != -1)
-                    favs.sort({'fav_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
-                else
-                    favs.toArray(function(err,docs){callback(null, docs)});
+        if (err) {
+            logger.info('get favroites schema error - '+err);
+            callback(err);
+        } else {
+            if(per_page != -1 && page != -1) {
+                    favs.sort({'fav_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                        if(err) {
+                            logger.info('get favorites schema error - '+err);
+                            callback(err);
+                        } else {
+                            callback(null, result);
+                        }
+                    });
+                } else {
+                    favs.toArray(function(err,docs){
+                        if(err) {
+                            logger.info('get favorites schema error - '+err);
+                            callback(err);
+                        } else {
+                            callback(null, docs);
+                        }
+                    });
+                }
         }
     });
 };
@@ -78,10 +100,19 @@ favSchema.statics.getFavoritesByDistance = function (user_id, user_lat, user_lon
         fav_lat: {$gte : Number(user_lat)-0.013, $lte : Number(user_lat)+0.013},
         fav_lon: {$gte : Number(user_lon)-0.016, $lte : Number(user_lon)+0.016},
     }, {projection: {"_id": 0, fav_lat: 1, fav_lon:1, fav_name:1, fav_addr:1, user_id:1, fav_id:1 }},
-    function (error, favs) {
-            if (error) callback(error);
-            else {
-                favs.toArray(function(err,fav){callback(null, fav)});
+    function (err, favs) {
+            if (err) {
+                logger.info('get favorites by distance schema error - '+err);
+                callback(err);
+            } else {
+                favs.toArray(function(err,fav){
+                    if(err) {
+                        logger.info('remove comment schema error - '+err);
+                        callback(err);
+                    } else{
+                        callback(null, fav);
+                    }
+                });
             }
         }
     );

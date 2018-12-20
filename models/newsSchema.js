@@ -23,8 +23,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get news collection count and update schema error - '+err);
+            } else{
                 cb(result.seq);
             }
         }
@@ -43,9 +44,8 @@ newsSchema.statics.updateNewsFromFB = function(news){
             news_img: news.news_img
         }, function (err, result) {
             if (err) {
-                logger.info(err);
-            }
-            else {
+                logger.info('update news from FB schema error - '+err);
+            } else {
                 // logger.info(result);
             }
         })
@@ -57,13 +57,30 @@ newsSchema.statics.getCardNews = function(per_page, page, callback){
     }, {projection: {"_id": 0, "news_id": 1, "post_id": 1,
         "description": 1, "date": 1, "news_img": 1}},
     function (err, news) {
-        if (err) callback(error);
-            else {
-                if(per_page != -1 && page != -1)
-                    news.sort({'news_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
-                else
-                    news.toArray(function(err,docs){callback(null, docs)});
+        if (err) {
+            logger.info('get cardnews schema error - '+err);
+            callback(err);
+        } else {
+            if(per_page != -1 && page != -1) {
+                news.sort({'news_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get cardnews schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, docs);
+                    }
+                });
+            } else {
+                news.toArray(function(err,docs){
+                    if (err) {
+                        logger.info('get cardnews schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, docs);
+                    }
+                });
             }
+        }
     });
 };
 

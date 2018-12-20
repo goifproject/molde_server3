@@ -15,8 +15,10 @@ userSchema.statics.addUser = function (user_id, user_name, user_token, callback)
         user_token: user_token,
         push_chk: 1,
     }, function (error, users) {
-        if (error) callback(error);
-        else {
+        if (error) {
+            logger.info('add user schema error - ' + err);
+            callback(error);
+        } else {
             callback(null, users);
         }
     })

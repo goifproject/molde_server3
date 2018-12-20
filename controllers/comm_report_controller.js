@@ -10,8 +10,9 @@ module.exports = function (router) {
         let page = req.query.page != undefined ? Number(req.query.page) : -1;
         let per_page = req.query.perPage != undefined ? Number(req.query.perPage) : -1;
         CommentReport.getCommentReports(per_page, page, function (err, reps) {
-            if (err) console.error(new Error(err));
-            else {
+            if (err) {
+                logger.info('get comment reports error - '+err);
+            } else {
                 res.json({data:reps});
             }
         })
@@ -22,7 +23,7 @@ module.exports = function (router) {
         let comm_id = req.body.commentId;
         CommentReport.removeCommentReport(comm_id, function (err, reps) {
             if (err) {
-                logger.info(err);
+                logger.info('remove comment for admin error - '+err);
                 res.status(200).send({result:0});
             }
             else {

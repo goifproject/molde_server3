@@ -19,14 +19,30 @@ safehouseSchema.statics.getSafehouse = function(safe_lat, safe_lon, per_page, pa
                                   {$pow: [{$divide: [{$subtract: [safe_lon, "$safe_lon"]}, 0.011]}, 2]}]
                   }}               
         }}],{},
-        function (error, safes) {
-                if (error) callback(error);
-                else {
+        function (err, safes) {
+                if (err) {
+                    logger.info('get safehouse schema error - '+err);
+                    callback(err);
+                } else {
                     if(per_page != -1 && page != -1)
-                        safes.sort({'distance':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
+                        safes.sort({'distance':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                            if(err) {
+                                logger.info('get safehouse schema error - '+err);
+                                callback(err);
+                            } else {
+                                callback(null, docs);
+                            }
+                        });
                     else{
                         // reports.sort({'distance':1}).toArray(function(err,docs){callback(null, docs)});
-                        safes.sort({'distance':1}).toArray(function(err,docs){callback(null, docs)});
+                        safes.sort({'distance':1}).toArray(function(err,docs) {
+                            if(err) {
+                                logger.info('get safehouse schema error - '+err);
+                                callback(err);
+                            } else {
+                                callback(null, docs);
+                            }
+                        });
                     }
                 }
             }

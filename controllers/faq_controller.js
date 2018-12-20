@@ -10,7 +10,7 @@ module.exports = function (router) {
 
         Faq.insertFaqData(user_id, user_name, contents, email, function (error, faq) {
             if (error) {
-                logger.info(err);
+                logger.info('insert faq error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result:1});
@@ -24,7 +24,7 @@ module.exports = function (router) {
 
         Faq.getFaqs(per_page, page, function (err, comments) {
             if (err) {
-                logger.info(err);
+                logger.info('get faqs error - '+err);
                 res.status(200).send({result:0});
             }
             else {

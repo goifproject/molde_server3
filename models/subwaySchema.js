@@ -19,14 +19,30 @@ subwaySchema.statics.getSubwayInfo = function(user_lat, user_lon, per_page, page
                                   {$pow: [{$divide: [{$subtract: [user_lon, "$subway_lon"]}, 0.011]}, 2]}]
                   }}               
         }}],{},
-        function (error, subs) {
-                if (error) callback(error);
-                else {
-                    if(per_page != -1 && page != -1)
-                        subs.sort({'distance':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
-                    else{
+        function (err, subs) {
+                if (err) {
+                    logger.info('get subway info schema error - ' + err);
+                    callback(err);
+                } else {
+                    if(per_page != -1 && page != -1) {
+                        subs.sort({'distance':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                            if(err) {
+                                logger.info('get subway info schema error - ' + err);
+                                callback(err);
+                            } else {
+                                callback(null, docs);
+                            }
+                        });
+                    } else {
                         // reports.sort({'distance':1}).toArray(function(err,docs){callback(null, docs)});
-                        subs.sort({'distance':1}).toArray(function(err,docs){callback(null, docs)});
+                        subs.sort({'distance':1}).toArray(function(err,docs){
+                            if(err) {
+                                logger.info('get subway info schema error - ' + err);
+                                callback(err);
+                            } else {
+                                callback(null, docs);
+                            }
+                        });
                     }
                 }
             }

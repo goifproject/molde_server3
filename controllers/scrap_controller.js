@@ -11,7 +11,7 @@ module.exports = function (router) {
         let news_id = req.body.cardNewsId;
         Scrap.addScrap(user_id, news_id, function (err, result) {
             if (err) {
-                logger.info(err);
+                logger.info('add scrap error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result: 1});
@@ -25,7 +25,7 @@ module.exports = function (router) {
         let scrap_id = req.body.cardNewsScrapId;
         Scrap.removeScrap(user_id, scrap_id, function (err, result) {
             if (err) {
-                logger.info(err);
+                logger.info('remove scrap error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result: 1});
@@ -40,7 +40,7 @@ module.exports = function (router) {
         let per_page = req.query.perPage != undefined ? Number(req.query.perPage) : -1;
         Scrap.getScraps(user_id, per_page, page, function (err, scraps) {
             if (err) {
-                logger.info(err);
+                logger.info('get scraps error - '+err);
                 res.status(200).send({result:0});
             }
             else {
@@ -55,7 +55,7 @@ module.exports = function (router) {
         let news_id = Number(req.query.cardNewsId);
         Scrap.isScrapExist(user_id, news_id, function (err, scraps) {
             if (err) {
-                logger.info(err);
+                logger.info('get if scrap exists error - '+err);
                 res.status(200).send({result:0});
             }
             else {

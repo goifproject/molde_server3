@@ -14,13 +14,6 @@ const settings = {timestampsInSnapshots: true};
 db.settings(settings); 
 
 var users_collection = db.collection('users');
-// var query =  users_collection.where('uId', '==', 'PdrAOLZ7s0cz7nX4utwjvynJm103');
-
-// query.get().then(querySnapshot => {
-//     querySnapshot.forEach(documentSnapshot => {
-//         logger.info(documentSnapshot.data().token);
-//     });
-// });
 
 let fcmConfig = fs.readFileSync("./config/fcmconfig.json");
 let firebase = JSON.parse(fcmConfig);
@@ -29,16 +22,14 @@ var serverKey = firebase.serverKey;
 var fcm = new FCM(serverKey);
 
 exports.sendNewReportPush = function(uid, rep_id) {
-   logger.info('(new push)push to '+uid);
     var query =  users_collection.where('uId', '==', uid);
     query.get().then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-            logger.info("token : " + documentSnapshot.data().token);
             var message = {
                 to: documentSnapshot.data().token,
                 // collapse_key: 'your_collapse_key', 
                 data: {
-                    type: 1,
+                    type: 0,
                     feedId: rep_id
                 },
                 notification: {
@@ -52,9 +43,9 @@ exports.sendNewReportPush = function(uid, rep_id) {
         
             fcm.send(message, function(err, response){
                 if (err) {
-                    logger.info("Something has gone wrong!");
+                    logger.info("FCM error - " + err);
                 } else {
-                    logger.info("Successfully sent with response: ", response);
+                    // logger.info("Successfully sent with response: ", response);
                 }
             });
         }); 
@@ -62,11 +53,9 @@ exports.sendNewReportPush = function(uid, rep_id) {
 };
 
 exports.sendStateChangePush = function(uid, rep_id) {
-    logger.info('(state change)push to '+uid);
     var query =  users_collection.where('uId', '==', uid);
     query.get().then(querySnapshot => {
         querySnapshot.forEach(documentSnapshot => {
-            logger.info("token : " + documentSnapshot.data().token);
             var message = {
                 to: documentSnapshot.data().token,
                 // collapse_key: 'your_collapse_key', 
@@ -85,9 +74,9 @@ exports.sendStateChangePush = function(uid, rep_id) {
         
             fcm.send(message, function(err, response){
                 if (err) {
-                    logger.info("Something has gone wrong!");
+                    logger.info("FCM error - " + err);
                 } else {
-                    logger.info("Successfully sent with response: ", response);
+                    // logger.info("Successfully sent with response: ", response);
                 }
             });
         }); 

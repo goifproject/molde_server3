@@ -16,8 +16,9 @@ function getNextId(name,cb){
         {$inc: {seq: 1}},
         {projection: {"_id": 0, "seq": 1 }},
         function(err, result){
-            if(err) logger.info(new Error(err));
-            else{
+            if(err) {
+                logger.info('get scrap collection count and update schema error - '+err);
+            } else {
                 cb(result.seq);
             }
         }
@@ -31,8 +32,10 @@ scrapSchema.statics.addScrap = function(user_id, news_id, callback){
             user_id: user_id,
             news_id: Number(news_id)
         }, function (err, result) {
-            if (err) callback(err);
-            else {
+            if (err) {
+                logger.info('add scrap schema error - ' + err);
+                callback(err);
+            } else {
                 callback(null, result);
             }
         })
@@ -44,8 +47,10 @@ scrapSchema.statics.removeScrap = function(user_id, scrap_id, callback){
         user_id: user_id,
         scrap_id: Number(scrap_id)
     },function(err, result){
-        if(err) callback(err);
-        else{
+        if(err) {
+            logger.info('remove scrap schema error - ' + err);
+            callback(err);
+        } else {
             callback(null, result);
         }
     });
@@ -56,12 +61,28 @@ scrapSchema.statics.getScraps = function(user_id, per_page, page, callback){
         user_id: user_id
     }, {projection: {"_id": 0, "user_id": 1, "scrap_id": 1, "news_id": 1 }},
     function (err, scraps) {
-        if (err) callback(err);
-        else {
+        if (err) {
+            logger.info('get scraps schema error - ' + err);
+            callback(err);
+        } else {
             if(per_page != -1 && page != -1)
-                scraps.sort({'scrap_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){callback(null, docs)});
+                scraps.sort({'scrap_id':1}).skip(page*per_page).limit(per_page).toArray(function(err,docs){
+                    if(err) {
+                        logger.info('get scraps schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, docs);
+                    }
+                });
             else
-                scraps.toArray(function(err,docs){callback(null, docs)});
+                scraps.toArray(function(err,docs){
+                    if(err) {
+                        logger.info('get scraps schema error - '+err);
+                        callback(err);
+                    } else {
+                        callback(null, docs);
+                    }
+                });
         }
     });
 };

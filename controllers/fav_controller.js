@@ -14,7 +14,7 @@ module.exports = function (router) {
         let fav_lon = req.body.favoriteLng;
         Favorite.addFavorite(user_id, fav_name, fav_addr, fav_lat, fav_lon, function (err, result) {
             if (err) {
-                logger.info(err);
+                logger.info('add favorite error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result: 1});
@@ -28,7 +28,7 @@ module.exports = function (router) {
         let fav_id = req.body.favoriteId;
         Favorite.removeFavorite(user_id, fav_id, function (err, result) {
             if (err) {
-                logger.info(err);
+                logger.info('remove favorite error - '+err);
                 res.status(200).send({result:0});
             } else {
                 res.status(200).send({result: 1});
@@ -43,7 +43,7 @@ module.exports = function (router) {
         let per_page = req.query.perPage != undefined ? Number(req.query.perPage) : -1;
         Favorite.getFavorites(user_id, per_page, page, function (err, favs) {
             if (err){
-                logger.info(err);
+                logger.info('get favorites error - '+err);
                 res.status(200).send({result:0});
             }
             else {
@@ -59,7 +59,7 @@ module.exports = function (router) {
         let fav_lon = req.query.favoriteLng;
         Favorite.getFavoritesByDistance(user_id, fav_lat, fav_lon, function (err, favs) {
             if (err){
-                logger.info(err);
+                logger.info('get favorite by distance error - '+err);
                 res.status(200).send({result:0});
             }
             else {

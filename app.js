@@ -2,16 +2,9 @@ var express = require('express');
 var mongoose = require("mongoose");
 let fs = require("fs");
 var path = require('path');
-var favicon = require('serve-favicon');
-// var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
 var http = require("http");
-
 var logger = require('./service/logger');
-
-// var Safehouse = require("./service/csvToDatabase");
-// var Subway = require('./service/subwayData');
 var Facebook = require("./service/facebook");
 var FCM = require("./service/fcm");
 
@@ -31,40 +24,28 @@ var news_router = require("./routes/news_router");
 var safehosue_router = require("./routes/safehouse_router");
 
 var app = express();
-var port = process.env.PORT || 7019;
+var port = process.env.PORT || 3000;
 
 // db 연결
 var db = mongoose.connection;
-let dbFile = fs.readFileSync("./db_config/db.json");
+let dbFile = fs.readFileSync("./config/dbconfig.json");
 let dbConfig = JSON.parse(dbFile);
 var dbUrl = dbConfig.dbUrl;
 
-var MongoClient = require("mongodb").MongoClient;
-var promise = mongoose.connect(dbUrl, {
-    }, function (mongoError) {
-        if (mongoError) logger.info(new Error("DB연결 에러"));
-        else {
+mongoose.connect(dbUrl, {}, function (mongoError) {
+        if (mongoError) {
+            logger.info(new Error("DB연결 에러"));
+        } else {
             logger.info("DB 연결 성공");
         }
     }
 );
 
-// Subway.addToDatabase();
-// Safehouse.addToDatabase();
+setInterval(function(){
+    Facebook.getFacebookPosts()
+}, 86400000);
 
-setInterval(function(){Facebook.getFacebookPosts()}, 86400000);
-// setInterval(function(){Facebook.getFacebookPosts()}, 180000);
-// Facebook.getFacebookPosts()
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 app.set('port', port);
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-// app.use(logger('dev'));
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -102,7 +83,7 @@ app.use(function (err, req, res, next) {
 
 var server = http.createServer(app);
 server.listen(app.get('port'), function () {
-    logger.info("서버 연동 완료");
+    logger.info("Server is running on port " + port);
 });
 
 module.exports = app;

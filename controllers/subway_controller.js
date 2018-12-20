@@ -11,7 +11,7 @@ module.exports = function (router) {
 
         Subway.getSubwayInfo(user_lat, user_lon, per_page, page, function (err, data) {
             if (err) {
-                logger.info(err);
+                logger.info('get subway info error - '+err);
                 res.status(200).send({result:0});
             }
             else {
