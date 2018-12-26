@@ -32,13 +32,13 @@ exports.sendNewReportPush = function(uid, rep_id) {
                     type: 0,
                     feedId: rep_id
                 },
-                notification: {
-                    title: '새 피드 등록',
-                    body: '즐겨찾기 근처에 새 피드가 생성되었습니다.',
-                    // sound: "default",
-                    // click_action: "FCM_PLUGIN_ACTIVITY",
-                    // icon: "fcm_push_icon"
-                }
+                // notification: {
+                //     title: '새 피드 등록',
+                //     body: '즐겨찾기 근처에 새 피드가 생성되었습니다.',
+                //     // sound: "default",
+                //     // click_action: "FCM_PLUGIN_ACTIVITY",
+                //     // icon: "fcm_push_icon"
+                // }
             };
         
             fcm.send(message, function(err, response){
@@ -63,13 +63,13 @@ exports.sendStateChangePush = function(uid, rep_id) {
                     type: 1,
                     feedId: rep_id
                 },
-                notification: {
-                    title: '피드 상태 변화',
-                    body: '등록하신 피드의 상태가 변했습니다.',
-                    // sound: "default",
-                    // click_action: "FCM_PLUGIN_ACTIVITY",
-                    // icon: "fcm_push_icon"
-                }
+                // notification: {
+                //     title: '피드 상태 변화',
+                //     body: '등록하신 피드의 상태가 변했습니다.',
+                //     // sound: "default",
+                //     // click_action: "FCM_PLUGIN_ACTIVITY",
+                //     // icon: "fcm_push_icon"
+                // }
             };
         
             fcm.send(message, function(err, response){
